@@ -16,5 +16,6 @@ To start a new proposal, you need to:
 | GEP                             | Title          |
 |---------------------------------|----------------|
 | [0001](./proposals/0001-gep.md) | Service Config |
+| [0002](./proposals/0002-gep.md) | Unified API |
 
 
