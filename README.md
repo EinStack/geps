@@ -13,9 +13,10 @@ To start a new proposal, you need to:
 
 ## Proposals
 
-| GEP                                                | Title               |
-|----------------------------------------------------|---------------------|
-| [0001](./proposals/0001-gep.md)                    | Service Config      |
-| [0005](./proposals/0005-fallback-rounting.md)      | Fallback & Routing  |
+| GEP                             | Title              |
+|---------------------------------|--------------------|
+| [0001](./proposals/0001-gep.md) | Service Config     |
+| [0002](./proposals/0002-gep.md) | Unified API        |
+| [0005](./proposals/0005-fallback-rounting.md)     | Fallback & Routing |
 
 
