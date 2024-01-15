@@ -225,5 +225,5 @@ The model pool abstraction seems like a powerful idea that allows to do these th
 
 ## Future Work
 
-- Cost- and performance-based routing is out of scope for Glide MVP, but could be brought on later on
+- Cost- and performance-based routing is out of scope for Glide MVP, but could be brought on later on. An example could be a use of budgets as weights to determine what portion of traffic each model should serve.
 - Streaming model responses & model that accept streaming input (e.g. STT models) are out of scope right now, but will be considered in the future 
