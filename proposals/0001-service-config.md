@@ -90,14 +90,14 @@ The most minimalistic possible config setup would look like this:
 ```yaml
 routes:
   language:
-    - name: openai-pool
+    - id: openai-pool
       providers:
-        - name: openai-boring
-          provider: openai
-          model: gpt-3.5-turbo
-          api_key: ${env:OPENAI_API_KEY}
-          default_params:
-            temperature: 0
+        - id: openai-boring
+          openai:
+              model: gpt-3.5-turbo
+              api_key: ${env:OPENAI_API_KEY}
+              default_params:
+                temperature: 0
 ```
 
 Here is a rich config example to get better sense of the config structure:
@@ -127,73 +127,75 @@ api:
 
 routes:
   language:
-    - name: openai-pool
-      balancing: priority # round-robin, weighted-round-robin, priority, least-latency, priority, etc.
-      providers:
-        - name: openai-boring
-          provider: openai # anthropic, azureopenai, gemini, other providers we support
-          model: gpt-3.5-turbo
-          api_key: ${env:OPENAI_API_KEY}
-          default_params:
-            temperature: 0
-        - name: anthropic-boring
-          provider: anthropic
-          model: claude-2
-          apiKey: ${env:ANTHROPIC_API_KEY}
-          default_params: # set the default request params
-            temperature: 0
+    - id: openai-pool
+      strategy: priority # round-robin, weighted-round-robin, priority, least-latency, priority, etc.
+      models:
+        - id: openai-boring
+          openai: # anthropic, azureopenai, gemini, other providers we support
+            model: gpt-3.5-turbo
+            api_key: ${env:OPENAI_API_KEY}
+            default_params:
+              temperature: 0
 
-    - name: latency-critical-pool
-      balancing: least-latency
-      providers:
-        - name: openai-boring
-          provider: openai
-          model: gpt-3.5-turbo
-          api_key: ${env:OPENAI_API_KEY}
-          timeout_ms: 200
-        - name: anthropic-boring
-          provider: anthropic
-          api_key: ${env:ANTHROPIC_API_KEY}
-          timeout_ms: 200
+        - id: anthropic-boring
+          anthropic:
+            model: claude-2
+            apiKey: ${env:ANTHROPIC_API_KEY}
+            default_params: # set the default request params
+              temperature: 0
 
-    - name: anthropic
-      balancing: weighted-round-robin
-      providers:
-        - name: openai
-          provider: openai
-          api_key: ${env:OPENAI_API_KEY}
+    - id: latency-critical-pool
+      strategy: least-latency
+      models:
+        - id: openai-boring
+          timeout_ms: 200
+          openai:
+            model: gpt-3.5-turbo
+            api_key: ${env:OPENAI_API_KEY}
+         
+        - id: anthropic-boring
+          timeout_ms: 200
+          anthropic:
+            api_key: ${env:ANTHROPIC_API_KEY}
+
+    - id: anthropic
+      strategy: weighted-round-robin
+      models:
+        - id: openai
           weight: 30
-        - name: anthropic
-          provider: anthropic
-          api_key: ${env:ANTHROPIC_API_KEY}
+          openai:
+            api_key: ${env:OPENAI_API_KEY}
+        - id: anthropic
           weight: 70
+          anthropic:
+            api_key: ${env:ANTHROPIC_API_KEY}
 
-    - name: ab-test1
-      balancing: weighted-round-robin
-      providers:
-        - name: openai-gpt4
-          provider: openai
-          model: gpt-4
-          api_key: ${env:OPENAI_API_KEY}
+    - id: ab-test1
+      strategy: weighted-round-robin
+      models:
+        - id: openai-gpt4
           weight: 50
-          default_params:
-            temperature: 0.7
+          openai:
+            model: gpt-4
+            api_key: ${env:OPENAI_API_KEY}
+            default_params:
+              temperature: 0.7
 
-        - name: openai-chatgpt
-          provider: openai
-          model: gpt-3.5-turbo
-          api_key: ${env:OPENAI_API_KEY}
+        - id: openai-chatgpt
           weight: 50
-          default_params:
-            temperature: 0.7
+          openai:
+            model: gpt-3.5-turbo
+            api_key: ${env:OPENAI_API_KEY}
+            default_params:
+              temperature: 0.7
 
         # we want to use OpenAI only in this A/B test, but that's bad resiliency wise
         # so add Anthropic just in case OpenAI is down
-        - name: anthropic-fallback
-          provider: anthropic
-          model: claude-2
-          api_key: ${env:ANTHROPIC_API_KEY}
+        - id: anthropic-fallback
           weight: 0
+          anthropic:
+            model: claude-2
+            api_key: ${env:ANTHROPIC_API_KEY}
 
 # in case of speach-to-text models
 #  transcribers:
@@ -206,7 +208,6 @@ routes:
 # in case of embeddings API
 #  embeddings:
 #    - ...
-
 ```
 
 ### References
