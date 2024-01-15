@@ -67,7 +67,20 @@ TBU
 
 ## Release
 
-TBU
+The release process step by step:
+
+- Merge `develop` into `main`
+- Tag the merge commit with a new version
+- Create a Github Release for the tag with release notes
+- Wait until Github Action jobs build and push artifacts
+
+### Versioning
+
+Glide uses semantic versioning. 
+
+Before going with exact version (e.g. 0.0.2), we should one or more release candidates. 
+This should allow people to test the new changes early and give us early feedback. 
+Also, it's normally a case that you may forget to add something to the release, so it's useful to have release candidates and wait a few days before promoting that build to the "stable" version. 
 
 ## References
 
