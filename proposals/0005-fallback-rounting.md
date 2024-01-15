@@ -65,25 +65,88 @@ how incoming requests should be served.
 The model pool ID or name is exposed to clients and they provide IDs during requests (see GEP0002).
 This is how Glide understands which one should serve the concrete request.
 
-### Model Pools & Fallbacking
+### Model Routing & Fallbacking
 
-TBU
+Glide leverages fallback models on the first fail and do adaptive health tracking (via token bucket). 
+Moving right to the next model serves as a retry for the first one while we spend as little time as possible waiting. 
 
-### Model Pool Config
+Then, the whole service instance is going to be aware about number of fails that happen to a certain model 
+and as soon as that number goes over the roof, 
+the model is going to be "disqualified" to serve requests for some time. 
+This means that as soon as the model is dead we pull it out of the pool, so the next requests are going to be served by healthy models only. 
+This strategy should lead to much better latency on failover.
+
+![Routing & Fallbacks](./imgs/glide-fallback-logic.png)
+
+### Routing Strategies
+
+#### Priority
+
+Route tracking to the first healthy model in the order in which the user defined models in the router setup.
+So if the first model is healthy it's going to handle all requests until it's unavailable. 
+Then, the second model will handle all requests, and so on.
+
+If the first model is available again, all traffic will go to it.
+
+#### Round Robin
+
+Iterate through model list in cycle. 
+If the model is not available, it will iterate again until it finds a healthy model or make a full cycle with no luck.
+
+### Weighted Round Robin
+
+Send each model traffic proportional to the model weight.
+
+If a model become unavailable, it's taken out of consideration completely until it's available again.
+So the traffic split was:
+- model A: 8
+- model B: 1
+- model C 1
+
+And the model A becomes unavailable, then model B & C will handle an equal portion of all traffic.
+
+### Least Latency
+
+Picks a healthy model with the least average latency over time. 
+If the least latency model becomes unhealthy, it will pick the second the best, etc.
+
+Since we don't know the true distribution of model latencies,
+and it's likely a moving value, we do some attempts to estimate it and keep updated over time.
+
+The algorithm consists of two stages:
+- Warm up: Before considering model latencies we may want to collect more than one sample to make better decisions.
+To learn about latencies, we route requests to all "cold" models in round-robin manner
+- Least Latency selection: Once all models are warmed, we pick one with the least latency
+
+All latency probes are summarized by moving average algorithm. 
+Instead of just giving all samples the same weight, we use Exponentially Weighted Moving Average that deprioritizes old latency samples.
+
+Additionally, we should update our latency stats as response latency is a dynamic distribution,
+we cannot simply stick to the fastest model discovered on the warmup stage (as we could overlook
+other model latencies that might have improved over time).
+For that, we introduced expiration time after which the model receives a request
+even if it was not the fastest to respond.
+
+### Lang Router Config
 
 The config structure was already covered in [GEP0001](0001-gep.md), so in the GEP, let's just focus on the
 model pool config specifically:
 
 ```YAML
 # some other configs...
-routes:
+routers:
   language:
     - id: my-pool
       enabled: true # # bool, true by default
-      strategy: priority # round-robin, weighted-round-robin, priority, least-latency, priority, etc.
+      strategy: priority # round_robin, weighted_round_robin, priority, least_latency, priority, etc.
       models:
         - id: openai-boring
           enabled: true # bool, true by default
+          error_budget: "30/s" # supported time units: ms, s, m, h
+          latency:
+            decay: 0.06
+            warmup_samples: 3
+            update_interval: "30s"
           openai: # anthropic, azureopenai, gemini, other providers we support
             model: gpt-3.5-turbo
             api_key: ${env:OPENAI_API_KEY}
@@ -99,7 +162,7 @@ Notes:
 - Each model ID should be unique for the pool it's defined in
 - Pool and model definition include the "enabled" field to simplify disabling pools/models without a need to remove their definitions from the file
 
-### Pool API
+### Router API
 
 This could be useful to have an ability to inspect the current pool setup in case Glide users don't have access to the underlying gateway configuration (it's likely that gateway is deployed by the team that doesn't do LLM work directly, but rather helps with operations/engineering).
 
@@ -117,7 +180,6 @@ GET /v1/language/
         "id": "openai-boring",
         "openai": {
           "model": "gpt-3.5-turbo",
-          "api_key": "[REDACTED]",
           "default_params": {
             "temperature": 0
           }
@@ -155,15 +217,11 @@ The model pool abstraction seems like a powerful idea that allows to do these th
 
 ### References
 
-- https://github.com/zehuamama/balancer/
-- https://github.com/yyyar/gobetween/tree/master/src/balance
-- https://github.com/mr-karan/balance/blob/main/balance.go
-- https://github.com/liangwt/wrr/blob/master/scheduler.go
-- https://github.com/hedzr/lb/blob/master/wrr/wrr.go
-
-## Alternatives Considered
-
-[TBU, what other solutions were considered and why they were rejected]
+- https:github.com/zehuamama/balancer/
+- https:github.com/yyyar/gobetween/tree/master/src/balance
+- https:github.com/mr-karan/balance/blob/main/balance.go
+- https:github.com/liangwt/wrr/blob/master/scheduler.go
+- https:github.com/hedzr/lb/blob/master/wrr/wrr.go
 
 ## Future Work
 
