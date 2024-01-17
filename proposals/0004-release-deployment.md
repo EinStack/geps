@@ -32,7 +32,7 @@ We will distribute Glide in three ways:
 
 ### Binaries
 
-Pure binaries are convent to run Glide on local machines or in bare metal installations.
+Pure binaries are convenient to run Glide on local machines or in bare metal installations.
 They could be attached to Github releases to be able to download them directly or via popular installers (like Homebrew).
 
 Here is the build matrix:
@@ -56,6 +56,8 @@ Docker images could be run both:
 | distroless | An extra small special type of base used in prod                    |
 | RedHat UBI | A popular disto in the enterprise world                             |
 
+Other considerations:
+- Image tags are in format `{glide-version}-{distro}`. For example, `0.0.2-rc.1-alpine`.
 
 ### Get Started via Docker Compose
 
@@ -63,7 +65,14 @@ EinStack will provide a demo repo that could be cloned and started as easy as `d
 
 ### Image & Package Registry
 
-TBU
+There are tree types of artifacts and here are the corresponding registries to store them:
+
+
+| Artifact   | Registries                                                                                                                                     |
+|------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| Binary     | [Github Release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository), OS package providers |
+| Images     | [Github Container Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry )  |
+| Helm Chart | [ArtifactHub](https://artifacthub.io/)                                                                                                         |
 
 ## Release
 
@@ -86,6 +95,10 @@ Also, it's normally a case that you may forget to add something to the release, 
 
 - https://github.com/TykTechnologies/tyk?tab=readme-ov-file#get-started
 - https://github.com/traefik/traefik/blob/master/.goreleaser.yml
+
+## Alternatives
+
+- Docker, however, a super popular registry, requires a paid plan for organization to have image repositories
 
 ## Future Work
 
