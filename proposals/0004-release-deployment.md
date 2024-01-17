@@ -91,6 +91,9 @@ Before going with exact version (e.g. `0.0.2`), we should one or more release ca
 This should allow people to test the new changes early and give us early feedback. 
 Also, it's normally a case that you may forget to add something to the release, so it's useful to have release candidates and wait a few days before promoting that build to the "stable" version. 
 
+The tag is going to be provided via git and not going to be committed to the source code to avoid frequent issues with missing to update it.
+Then, it's going to be provided to the build scripts to "mark" artifacts by that version during the build phase.
+
 ## References
 
 - https://github.com/TykTechnologies/tyk?tab=readme-ov-file#get-started
