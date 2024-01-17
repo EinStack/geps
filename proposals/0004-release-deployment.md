@@ -76,16 +76,16 @@ The release process step by step:
 
 ### Versioning
 
-Glide uses semantic versioning. 
+Glide uses [semantic versioning](https://semver.org/). 
 
-Before going with exact version (e.g. 0.0.2), we should one or more release candidates. 
+Before going with exact version (e.g. `0.0.2`), we should one or more release candidates (e.g. `0.0.2-rc.1`)
 This should allow people to test the new changes early and give us early feedback. 
 Also, it's normally a case that you may forget to add something to the release, so it's useful to have release candidates and wait a few days before promoting that build to the "stable" version. 
 
 ## References
 
 - https://github.com/TykTechnologies/tyk?tab=readme-ov-file#get-started
-- 
+- https://github.com/traefik/traefik/blob/master/.goreleaser.yml
 
 ## Future Work
 
