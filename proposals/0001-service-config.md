@@ -1,5 +1,5 @@
 ---
-MEP: 1
+GEP: 1
 Title: Service Config
 Discussion: N/A
 Implementation: https://github.com/modelgateway/glide/pull/37
