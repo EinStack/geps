@@ -36,10 +36,32 @@ routes:
 
 #### User Request Schema for Embedding Route
 
-TBU
+```yaml
+{
+ "message": "Where was it played?",
+ "dimensions": 1536
+}
+```
 
 #### Response Schema for Embedding Route
-TBU
+```yaml
+{
+  "provider": "cohere",
+  "model": "embed-multilingual-v3.0",
+  "provider_response": {
+    "embedding": [
+        0.0023064255,
+        -0.009327292,
+        ....
+        -0.0028842222,
+      ],
+    "token_count": {
+      "prompt_tokens": 9,
+      "total_tokens": 9
+    }
+  }
+}
+```
 
 ## Alternatives Considered
 
