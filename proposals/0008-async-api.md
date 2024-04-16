@@ -49,7 +49,7 @@ Just like with our sync API, async API is configured on a specific router level 
 
 ### Async Routing
 
-![Async Routing Workflow](./imgs/async-router-architecture.svg)
+![Async Routing Workflow](./imgs/async-router-architecture.png)
 
 The key points:
 
