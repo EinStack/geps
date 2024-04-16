@@ -1,8 +1,8 @@
 ---
 GEP: 8
 Title: The Async API
-Discussion: N/A
-Implementation: Link
+Discussion: Handled in Discord
+Implementation: https://github.com/EinStack/glide/issues/149 https://github.com/EinStack/glide/issues/163 https://github.com/EinStack/glide/issues/195
 ---
 
 # The Async API
